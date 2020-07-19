@@ -167,6 +167,7 @@ We can use `git help <command>` or `git help <concept>` command to know more abo
 | Switch from one branch to another                            | `git checkout branch_name`      |
 | Create a new branch and switch to it                         | `git checkout -b branch_name`   |
 | Delete the feature branch from local repository              | `git branch -d <branchname>`    |
+| Push a branch to your remote repository                      | `git push origin <branchname>` |
 | Delete a branch on your remote repository                    | `git push origin :<branchname>` |
 
 
@@ -197,3 +198,7 @@ We can use `git help <command>` or `git help <concept>` command to know more abo
 ## References
 
 https://confluence.atlassian.com/bitbucketserver0414/basic-git-commands-895367449.html?utm_campaign=in-app-help&utm_medium=in-app-help&utm_source=stash
+
+
+清除： git config --system --unset credential.helper
+保存： git config credential.helper store
