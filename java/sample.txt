@@ -1,0 +1,5 @@
+  if(StringUtils.isNotBlank(orderVM.getOrderDateFrom()) && StringUtils.isNotBlank(orderVM.getOrderDateTo())){
+            Date from = DateUtils.parseDate(orderVM.getOrderDateFrom(), DateUtils.PATTERN_DATE);
+            Date to = DateUtils.parseDate(orderVM.getOrderDateTo()+ DateUtils.END_DATE_TIME , DateUtils.PATTERN_DATEALLTIME);
+            queryParams.and(new Filter("orderDate", Filter.Operator.between, Arrays.asList(from, to)));
+        }
