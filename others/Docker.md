@@ -7,9 +7,20 @@
 - Dockerfile
   - FROM
   - RUN
-  - ENV
+  - COPY
+  - USER
+  - WORKDIR
+  - ARG
+     build time only, i.e. in Dockfile only
+  - ENV(`--env on docker run`)
+    ```
+      ENV PORT 80
+      EXPOSE $PORT
+      docker run -e PORT=8080
+    ```
   - ADD
-  - VOLUMN
+  - VOLUMe
+  - EXPOSE 
   - ENTRYPOINT or CMD
 
 ```
@@ -28,12 +39,52 @@
     CMD ["executable","param1","param2"] (exec 格式，推荐用此格式)
     CMD ["param1","param2"] (作为ENTRYPOINT 的默认参数)
     CMD command param1 param2 (shell 格式)
-
+     
+     //tip
+     // less change cmd at the top of Docker files
 
 ```
+- docker cmd:
+`docker logs -n 5 -t containerName`
+`docker history image-name`
+`docker run -d -p 80:80 -name xxx`
+`docker exec -it  containerName bash`
+`docker ps -a`
+`docker start containerName`
+`docker rm -f containerName`
+`docker cp file.txt container-name:/app/data`
 
-- Volume
+- container related
+`docker container prune`
+`docker container rm -f $(docker container ls -aq)`
+
+- Images related:
+ 
+ `docker image save -o image.tar image`
+ `docker image load -i image.tar`
+ `docker image rm -f $(docker image ls -aq)`
+
+- Volume related
   docker volume
+
+  -- anonymous volume:
+      ```
+        #Dockfile:
+        VOLUME [ "/app/node_modules" ]
+
+        #cmd:
+        docker run -d -v  /app/data myimage`
+
+      ```
+      will be removed once the container is deleted.
+    -- named volumn
+      `docker run -d -v myvolume:/app/data myimage`
+    -- Bind Mounts: not managed by docker
+    `docker run -d -v /home/myhome/data:/app/data myimage`
+    `docker run -d -v $(pwd):/app/data myimage`
+
+    -- readonly
+    `docker run -d -v /home/myhome/data:/app/data:ro myimage`
 
 ```
     docker volumn [cmd]
@@ -44,8 +95,19 @@
         rm          Remove one or more volumes
 
     docker run -v /my/own/data:/data/db -d mongo
+    //create volume of current work dir to /data/db 
+    docker run -v $(pwd):/data/db -d mongo
 ```
 
-- Network
+- Network  
+ - connect to host service
+  `host.docker.internal`
+ - create network
+ ```
+   docker network create mynetwork
+   //use the network
+   docker run --network mynetwork myimage
 
--
+```
+
+- j
