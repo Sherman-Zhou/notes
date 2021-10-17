@@ -1,0 +1,9 @@
+/data/es/logs/*
+/data/es/repo/*
+/data/es/db/*
+/data/nginx/logs/*
+!/data/.gitkeep
+!/data/es/logs/.gitkeep
+!/data/es/repo/.gitkeep
+!/data/es/db/.gitkeep
+!/data/nginx/logs/.gitkeep

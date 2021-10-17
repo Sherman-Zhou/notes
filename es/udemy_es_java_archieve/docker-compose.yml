@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  udemy_java_es:
+    network_mode: "host"
+    container_name: "udemy_java_es"
+    image: springio/spring-boot-es-udemy
+    restart: always
+    depends_on:
+      - udemy_javaes_elasticsearch
+    ports:
+      - "8080:8080"
+    expose:
+      - 8080
+
+  udemy_javaes_elasticsearch:
+    build: ./ci/elasticsearch
+    network_mode: "host"
+    environment:
+      -  discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    container_name: "udemy_javaes_elasticsearch"
+    volumes:
+      - ./ci/data/es/db:/usr/share/elasticsearch/data
+      - ./ci/data/es/logs:/usr/share/elasticsearch/logs
+      - ./ci/data/es/repo:/usr/share/elasticsearch/repo
+    ports:
+      - "9200:9200"
+    expose:
+      - "9200"
