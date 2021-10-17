@@ -1,0 +1,467 @@
+{
+	"info": {
+		"_postman_id": "74cc93c6-998c-4f4a-a28e-a05d5b6c12cd",
+		"name": "Advanced search - mapping",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "hotels_advanced",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"settings\": {\n        \"number_of_shards\": 1,\n        \"analysis\": {\n            \"filter\": {\n                \"spanish_stop\": {\n                    \"type\": \"stop\",\n                    \"stopwords\": \"_spanish_\"\n                },\n                \"spanish_keywords\": {\n                    \"type\": \"keyword_marker\",\n                    \"keywords\": []\n                },\n                \"spanish_stemmer\": {\n                    \"type\": \"stemmer\",\n                    \"language\": \"light_spanish\"\n                }\n            },\n            \"analyzer\": {\n                \"spanish\": {\n                    \"tokenizer\": \"standard\",\n                    \"filter\": [\n                        \"lowercase\",\n                        \"spanish_stop\",\n                        \"spanish_keywords\",\n                        \"spanish_stemmer\"\n                    ]\n                },\n                \"lowercased_string\": {\n                    \"filter\": [\n                        \"lowercase\"\n                    ],\n                    \"tokenizer\": \"keyword\"\n                }\n            }\n        }\n    },\n    \"mappings\": {\n        \"properties\": {\n            \"hotel\": {\n                \"properties\": {\n                \t\"id\": {\n                        \"type\": \"integer\"\n                    },\n                    \"city_name_es\": {\n                        \"analyzer\": \"spanish\",\n                        \"type\": \"text\"\n                    },\n                    \"city_name_en\": {\n                        \"type\": \"text\"\n                    },\n                    \"place_desc_es\": {\n                        \"analyzer\": \"spanish\",\n                        \"type\": \"text\"\n                    },\n                    \"place_desc_en\": {\n                        \"type\": \"text\"\n                    },\n                    \"name\": {\n                        \"type\": \"text\",\n                        \"fields\": {\n                            \"keyword\": {\n                                \"ignore_above\": 256,\n                                \"type\": \"keyword\"\n                            }\n                        }\n                    },\n                    \"stars\": {\n                        \"type\": \"integer\"\n                    },\n                    \"rating\": {\n                        \"type\": \"float\"\n                    },\n                    \"age\": {\n                        \"type\": \"integer\"\n                    },\n                    \"free_places_at_now\": {\n                        \"type\": \"boolean\"\n                    },\n                    \"location\": {\n                        \"type\": \"geo_point\"\n                    },\n                    \"created_at\": {\n                        \"format\": \"yyyy/MM/dd HH:mm:ss||yyyy/MM/dd||epoch_millis\",\n                        \"type\": \"date\"\n                    },\n                    \"facilities\": {\n                        \"type\": \"text\"\n                    },\n                    \"comments\": {\n                        \"type\": \"nested\",\n                        \"properties\": {\n                        \t\"hotel_id\": {\n                                \"type\": \"integer\"\n                            },\n                            \"user_login\": {\n                                \"type\": \"text\"\n                            },\n                            \"content\": {\n                                \"type\": \"text\"\n                            },\n                            \"user_age\": {\n                                \"type\": \"integer\"\n                            },\n                            \"stars\": {\n                                \"type\": \"integer\"\n                            },\n                            \"date\": {\n                                \"type\": \"date\",\n                                \"format\": \"yyyy/MM/dd HH:mm:ss||yyyy/MM/dd||epoch_millis\"\n                            }\n                        }\n                    }\n                }\n            },\n            \"booking\": {\n                \"properties\": {\n                    \"user_login\": {\n                        \"type\": \"text\"\n                    },\n                    \"date\": {\n                        \"type\": \"date\",\n                        \"format\": \"yyyy/MM/dd HH:mm:ss||yyyy/MM/dd||epoch_millis\"\n                    },\n                    \"price\": {\n                        \"type\": \"float\"\n                    }\n                }\n            },\n            \"hotel_bookings_join_field\": {\n                \"type\": \"join\",\n                \"relations\": {\n                    \"hotel_parent\": \"booking_child\"\n                }\n            }\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9201/hotels_advanced",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9201",
+					"path": [
+						"hotels_advanced"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add 1st hotel",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"hotel\": {\n        \"id\": 1,\n        \"city_name_es\": \"Varsovia\",\n        \"city_name_en\": \"Warsaw\",\n        \"place_desc_es\": \"antiguo lugar historico\",\n        \"place_desc_en\": \"ancient historical place\",\n        \"name\": \"Golden star hotel\",\n        \"stars\": 5,\n        \"rating\": 4.85,\n        \"age\": 7,\n        \"free_places_at_now\": true,\n        \"location\": {\n            \"lat\": \"52.21\",\n            \"lon\": \"21.01\"\n        },\n        \"created_at\": \"2014/05/01\",\n        \"facilities\": [\n            \"parking\",\n            \"restaurant\",\n            \"wifi\"\n        ],\n        \"comments\": [\n            {\n                \"hotel_id\": 1,\n                \"user_login\": \"Adam\",\n                \"content\": \"Some comment\",\n                \"user_age\": 28,\n                \"stars\": 5,\n                \"date\": \"2021/08/01\"\n            },\n            {\n                \"hotel_id\": 1,\n                \"user_login\": \"Eva\",\n                \"content\": \"Some comment\",\n                \"user_age\": 28,\n                \"stars\": 3,\n                \"date\": \"2021/08/01\"\n            }\n        ]\n    },\n    \"hotel_bookings_join_field\": {\n        \"name\": \"hotel_parent\"\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9201/hotels_advanced/_doc/1?refresh",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9201",
+					"path": [
+						"hotels_advanced",
+						"_doc",
+						"1"
+					],
+					"query": [
+						{
+							"key": "refresh",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add 2d hotel",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"hotel\": {\n        \"id\": 2,\n        \"city_name_es\": \"Varsovia\",\n        \"city_name_en\": \"Warsaw\",\n        \"place_desc_es\": \"antiguo lugar historico\",\n        \"place_desc_en\": \"historical place\",\n        \"name\": \"Silver star hotel\",\n        \"stars\": 4,\n        \"rating\": 4.6,\n        \"age\": 9,\n        \"free_places_at_now\": true,\n        \"location\": {\n            \"lat\": \"52.13\",\n            \"lon\": \"21.00\"\n        },\n        \"created_at\": \"2012/02/01\",\n        \"facilities\": [\n            \"parking\",\n            \"wifi\"\n        ],\n        \"comments\": [\n            {\n                \"hotel_id\": 2,\n                \"user_login\": \"Taddi\",\n                \"content\": \"Some comment\",\n                \"user_age\": 38,\n                \"stars\": 4,\n                \"date\": \"2021/08/01\"\n            },\n            {\n                \"hotel_id\": 2,\n                \"user_login\": \"Moly\",\n                \"content\": \"Some comment\",\n                \"user_age\": 39,\n                \"stars\": 5,\n                \"date\": \"2021/07/21\"\n            },\n            {\n                \"hotel_id\": 2,\n                \"user_login\": \"Holy\",\n                \"content\": \"Some comment\",\n                \"user_age\": 45,\n                \"stars\": 4,\n                \"date\": \"2021/07/05\"\n            }\n        ]\n    },\n    \"hotel_bookings_join_field\": {\n        \"name\": \"hotel_parent\"\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9201/hotels_advanced/_doc/2?refresh",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9201",
+					"path": [
+						"hotels_advanced",
+						"_doc",
+						"2"
+					],
+					"query": [
+						{
+							"key": "refresh",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add 3d hotel",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"hotel\": {\n        \"id\": 3,\n        \"city_name_es\": \"Gdansk\",\n        \"city_name_en\": \"Gdansk\",\n        \"place_desc_es\": \"Hotel for young people\",\n        \"place_desc_en\": \"Hotel for young people\",\n        \"name\": \"Simple star hotel\",\n        \"stars\": 2,\n        \"rating\": 3.65,\n        \"age\": 10,\n        \"free_places_at_now\": true,\n        \"location\": {\n            \"lat\": \"51.77\",\n            \"lon\": \"19.41\"\n        },\n        \"created_at\": \"2011/05/01\",\n        \"facilities\": [\n            \"parking\",\n            \"restaurant\"\n        ],\n        \"comments\": [\n            {\n                \"hotel_id\": 3,\n                \"user_login\": \"Ada\",\n                \"content\": \"Some comment\",\n                \"user_age\": 22,\n                \"stars\": 4,\n                \"date\": \"2021/08/01\"\n            },\n            {\n                \"hotel_id\": 3,\n                \"user_login\": \"Evon\",\n                \"content\": \"Some comment\",\n                \"user_age\": 22,\n                \"stars\": 3,\n                \"date\": \"2021/07/01\"\n            }\n        ]\n    },\n    \"hotel_bookings_join_field\": {\n        \"name\": \"hotel_parent\"\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9201/hotels_advanced/_doc/3?refresh",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9201",
+					"path": [
+						"hotels_advanced",
+						"_doc",
+						"3"
+					],
+					"query": [
+						{
+							"key": "refresh",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add booking",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"booking\": {\n        \"user_login\": \"Bob\",\n        \"date\": \"2021/08/01\",\n        \"price\": 200\n    },\n    \"hotel_bookings_join_field\": {\n        \"name\": \"booking_child\",\n        \"parent\": \"1\"\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9201/hotels_advanced/_doc/4?routing=1&refresh",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9201",
+					"path": [
+						"hotels_advanced",
+						"_doc",
+						"4"
+					],
+					"query": [
+						{
+							"key": "routing",
+							"value": "1"
+						},
+						{
+							"key": "refresh",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Has parent example",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"query\": {\n        \"has_parent\": {\n            \"parent_type\": \"hotel_parent\",\n            \"query\": {\n                \"match\": {\n                    \"hotel.name\": \"golden\"\n                }\n            }\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9201/hotels_advanced/_search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9201",
+					"path": [
+						"hotels_advanced",
+						"_search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Has child example",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"query\": {\n        \"has_child\": {\n            \"type\": \"booking_child\",\n            \"query\": {\n                \"range\": {\n                    \"booking.price\": {\n                        \"gt\": 300\n                    }\n                }\n            }\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9201/hotels_advanced/_search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9201",
+					"path": [
+						"hotels_advanced",
+						"_search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search query",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"from\": 0,\n    \"size\": 10,\n    \"query\": {\n        \"bool\": {\n            \"must\": [\n                {\n                    \"match\": {\n                        \"hotel.name\": \"star\"\n                    }\n                },\n                {\n                    \"bool\": {\n                        \"should\": [\n                            {\n                                \"match\": {\n                                    \"hotel.city_name_es\": \"Varsovia\"\n                                }\n                            },\n                            {\n                                \"match\": {\n                                    \"hotel.city_name_en\": \"Varsovia\"\n                                }\n                            }\n                        ]\n                    }\n                }\n            ],\n            \"should\": [\n                {\n                    \"terms\": {\n                        \"hotel.facilities\": [\"restaurant\", \"wifi\"]\n                    }\n                },\n                {\n                    \"range\": {\n                        \"hotel.age\": {\n                            \"lt\": 10\n                        }\n                    }\n                }\n            ],\n            \"filter\": [\n                {\n                    \"term\": {\n                        \"hotel.free_places_at_now\": true\n                    }\n                },\n                {\n                    \"range\": {\n                        \"hotel.stars\": {\n                            \"gte\": 4\n                        }\n                    }\n                },\n                {\n                    \"range\": {\n                        \"hotel.rating\": {\n                            \"gte\": 4\n                        }\n                    }\n                },\n                {\n                    \"geo_distance\": {\n                        \"distance\": \"30km\",\n                        \"hotel.location\": {\n                            \"lat\": 52.23,\n                            \"lon\": 21.01\n                        }\n                    }\n                }\n            ]\n        }\n    },\n    \"sort\": [\n        {\n            \"_score\": {\n                \"order\": \"desc\"\n            }\n        },\n        {\n            \"hotel.name.keyword\": {\n                \"order\": \"desc\"\n            }\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9201/hotels_advanced/_search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9201",
+					"path": [
+						"hotels_advanced",
+						"_search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search query improvements",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"from\": 0,\n    \"size\": 10,\n    \"query\": {\n        \"bool\": {\n            \"must\": [\n                {\n                    \"match\": {\n                        \"hotel.name\": \"star\"\n                    }\n                },\n                {\n                    \"bool\": {\n                        \"should\": [\n                            {\n                                \"match\": {\n                                    \"hotel.city_name_es\": \"Varsovia\"\n                                }\n                            },\n                            {\n                                \"match\": {\n                                    \"hotel.city_name_en\": \"Varsovia\"\n                                }\n                            }\n                        ]\n                    }\n                },\n                {\n                    \"nested\": {\n                        \"path\": \"hotel.comments\",\n                        \"query\": {\n                            \"bool\": {\n                                \"must\": [\n                                    {\n                                        \"range\": {\n                                            \"hotel.comments.user_age\": {\n                                                \"gte\": 28\n                                            }\n                                        }\n                                    },\n                                    {\n                                        \"match\": {\n                                            \"hotel.comments.content\": \"comment\"\n                                        }\n                                    }\n                                ]\n                            }\n                        }\n                    }\n                }\n            ],\n            \"should\": [\n                {\n                    \"terms\": {\n                        \"hotel.facilities\": [\n                            \"restaurant\",\n                            \"wifi\"\n                        ]\n                    }\n                },\n                {\n                    \"range\": {\n                        \"hotel.age\": {\n                            \"lt\": 10\n                        }\n                    }\n                },\n                {\n                    \"distance_feature\": {\n                        \"field\": \"hotel.location\",\n                        \"pivot\": \"2km\",\n                        \"boost\": 2,\n                        \"origin\": [\n                            21.01,\n                            52.23\n                        ]\n                    }\n                }\n            ],\n            \"filter\": [\n                {\n                    \"term\": {\n                        \"hotel.free_places_at_now\": true\n                    }\n                },\n                {\n                    \"range\": {\n                        \"hotel.stars\": {\n                            \"gte\": 4\n                        }\n                    }\n                },\n                {\n                    \"range\": {\n                        \"hotel.rating\": {\n                            \"gte\": 4\n                        }\n                    }\n                },\n                {\n                    \"geo_distance\": {\n                        \"distance\": \"30km\",\n                        \"hotel.location\": {\n                            \"lat\": 52.23,\n                            \"lon\": 21.01\n                        }\n                    }\n                }\n            ]\n        }\n    },\n    \"sort\": [\n        {\n            \"_score\": {\n                \"order\": \"desc\"\n            }\n        },\n        {\n            \"hotel.name.keyword\": {\n                \"order\": \"desc\"\n            }\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9201/hotels_advanced/_search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9201",
+					"path": [
+						"hotels_advanced",
+						"_search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search query + agg",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"from\": 0,\n    \"size\": 10,\n    \"query\": {\n        \"bool\": {\n            \"must\": [\n                {\n                    \"match\": {\n                        \"hotel.name\": \"star\"\n                    }\n                },\n                {\n                    \"bool\": {\n                        \"should\": [\n                            {\n                                \"match\": {\n                                    \"hotel.city_name_es\": \"Varsovia\"\n                                }\n                            },\n                            {\n                                \"match\": {\n                                    \"hotel.city_name_en\": \"Varsovia\"\n                                }\n                            }\n                        ]\n                    }\n                },\n                {\n                    \"nested\": {\n                        \"path\": \"hotel.comments\",\n                        \"query\": {\n                            \"bool\": {\n                                \"must\": [\n                                    {\n                                        \"range\": {\n                                            \"hotel.comments.user_age\": {\n                                                \"gte\": 28\n                                            }\n                                        }\n                                    },\n                                    {\n                                        \"match\": {\n                                            \"hotel.comments.content\": \"comment\"\n                                        }\n                                    }\n                                ]\n                            }\n                        }\n                    }\n                }\n            ],\n            \"should\": [\n                {\n                    \"terms\": {\n                        \"hotel.facilities\": [\n                            \"restaurant\",\n                            \"wifi\"\n                        ]\n                    }\n                },\n                {\n                    \"range\": {\n                        \"hotel.age\": {\n                            \"lt\": 10\n                        }\n                    }\n                },\n                {\n                    \"distance_feature\": {\n                        \"field\": \"hotel.location\",\n                        \"pivot\": \"2km\",\n                        \"boost\": 2,\n                        \"origin\": [\n                            21.01,\n                            52.23\n                        ]\n                    }\n                }\n            ],\n            \"filter\": [\n                {\n                    \"term\": {\n                        \"hotel.free_places_at_now\": true\n                    }\n                },\n                {\n                    \"range\": {\n                        \"hotel.stars\": {\n                            \"gte\": 4\n                        }\n                    }\n                },\n                {\n                    \"range\": {\n                        \"hotel.rating\": {\n                            \"gte\": 4\n                        }\n                    }\n                },\n                {\n                    \"geo_distance\": {\n                        \"distance\": \"30km\",\n                        \"hotel.location\": {\n                            \"lat\": 52.23,\n                            \"lon\": 21.01\n                        }\n                    }\n                }\n            ]\n        }\n    },\n    \"aggs\": {\n        \"comments_agg\": {\n            \"nested\": {\n                \"path\": \"hotel.comments\"\n            },\n            \"aggs\": {\n                \"comments_per_hotel\": {\n                    \"terms\": {\n                        \"field\": \"hotel.comments.hotel_id\"\n                    },\n                    \"aggs\": {\n                        \"comments_by_month\": {\n                            \"date_histogram\": {\n                                \"field\": \"hotel.comments.date\",\n                                \"interval\": \"month\",\n                                \"format\": \"yyyy-MM\"\n                            },\n                            \"aggs\": {\n                                \"avg_rating\": {\n                                    \"avg\": {\n                                        \"field\": \"hotel.comments.stars\"\n                                    }\n                                }\n                            }\n                        }\n                    }\n                }\n            }\n        }\n    },\n    \"sort\": [\n        {\n            \"_score\": {\n                \"order\": \"desc\"\n            }\n        },\n        {\n            \"hotel.name.keyword\": {\n                \"order\": \"desc\"\n            }\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9201/hotels_advanced/_search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9201",
+					"path": [
+						"hotels_advanced",
+						"_search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Geo shape",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"query\": {\n        \"bool\": {\n            \"must\": {\n                \"match_all\": {}\n            },\n            \"filter\": {\n                \"geo_shape\": {\n                    \"hotel.location\": {\n                        \"shape\": {\n                            \"type\": \"polygon\",\n                            \"coordinates\": [\n                                [\n                                    [\n                                        20.8685302734375,\n                                        52.27992152930045\n                                    ],\n                                    [\n                                        20.830078125,\n                                        52.21602143271678\n                                    ],\n                                    [\n                                        20.841064453125,\n                                        52.13348804077147\n                                    ],\n                                    [\n                                        21.0992431640625,\n                                        52.05924589011585\n                                    ],\n                                    [\n                                        21.2969970703125,\n                                        52.10650519075632\n                                    ],\n                                    [\n                                        21.30523681640625,\n                                        52.26479561297205\n                                    ],\n                                    [\n                                        21.0498046875,\n                                        52.38398208257353\n                                    ],\n                                    [\n                                        20.8685302734375,\n                                        52.27992152930045\n                                    ]\n                                ]\n                            ]\n                        },\n                        \"relation\": \"within\"\n                    }\n                }\n            }\n        }\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9201/hotels_advanced/_search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9201",
+					"path": [
+						"hotels_advanced",
+						"_search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search query + agg + geo shape",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"from\": 0,\n    \"size\": 10,\n    \"query\": {\n        \"bool\": {\n            \"must\": [\n                {\n                    \"match\": {\n                        \"hotel.name\": \"star\"\n                    }\n                },\n                {\n                    \"bool\": {\n                        \"should\": [\n                            {\n                                \"match\": {\n                                    \"hotel.city_name_es\": \"Varsovia\"\n                                }\n                            },\n                            {\n                                \"match\": {\n                                    \"hotel.city_name_en\": \"Varsovia\"\n                                }\n                            }\n                        ]\n                    }\n                },\n                {\n                    \"nested\": {\n                        \"path\": \"hotel.comments\",\n                        \"query\": {\n                            \"bool\": {\n                                \"must\": [\n                                    {\n                                        \"range\": {\n                                            \"hotel.comments.user_age\": {\n                                                \"gte\": 28\n                                            }\n                                        }\n                                    },\n                                    {\n                                        \"match\": {\n                                            \"hotel.comments.content\": \"comment\"\n                                        }\n                                    }\n                                ]\n                            }\n                        }\n                    }\n                }\n            ],\n            \"should\": [\n                {\n                    \"terms\": {\n                        \"hotel.facilities\": [\n                            \"restaurant\",\n                            \"wifi\"\n                        ]\n                    }\n                },\n                {\n                    \"range\": {\n                        \"hotel.age\": {\n                            \"lt\": 10\n                        }\n                    }\n                },\n                {\n                    \"distance_feature\": {\n                        \"field\": \"hotel.location\",\n                        \"pivot\": \"2km\",\n                        \"boost\": 2,\n                        \"origin\": [\n                            21.01,\n                            52.23\n                        ]\n                    }\n                }\n            ],\n            \"filter\": [\n                {\n                    \"term\": {\n                        \"hotel.free_places_at_now\": true\n                    }\n                },\n                {\n                    \"range\": {\n                        \"hotel.stars\": {\n                            \"gte\": 4\n                        }\n                    }\n                },\n                {\n                    \"range\": {\n                        \"hotel.rating\": {\n                            \"gte\": 4\n                        }\n                    }\n                },\n                {\n                    \"geo_shape\": {\n                        \"hotel.location\": {\n                            \"shape\": {\n                                \"type\": \"polygon\",\n                                \"coordinates\": [\n                                    [\n                                        [\n                                            20.8685302734375,\n                                            52.27992152930045\n                                        ],\n                                        [\n                                            20.830078125,\n                                            52.21602143271678\n                                        ],\n                                        [\n                                            20.841064453125,\n                                            52.13348804077147\n                                        ],\n                                        [\n                                            21.0992431640625,\n                                            52.05924589011585\n                                        ],\n                                        [\n                                            21.2969970703125,\n                                            52.10650519075632\n                                        ],\n                                        [\n                                            21.30523681640625,\n                                            52.26479561297205\n                                        ],\n                                        [\n                                            21.0498046875,\n                                            52.38398208257353\n                                        ],\n                                        [\n                                            20.8685302734375,\n                                            52.27992152930045\n                                        ]\n                                    ]\n                                ]\n                            },\n                            \"relation\": \"within\"\n                        }\n                    }\n                }\n            ]\n        }\n    },\n    \"aggs\": {\n        \"comments_agg\": {\n            \"nested\": {\n                \"path\": \"hotel.comments\"\n            },\n            \"aggs\": {\n                \"comments_per_hotel\": {\n                    \"terms\": {\n                        \"field\": \"hotel.comments.hotel_id\"\n                    },\n                    \"aggs\": {\n                        \"comments_by_month\": {\n                            \"date_histogram\": {\n                                \"field\": \"hotel.comments.date\",\n                                \"interval\": \"month\",\n                                \"format\": \"yyyy-MM\"\n                            },\n                            \"aggs\": {\n                                \"avg_rating\": {\n                                    \"avg\": {\n                                        \"field\": \"hotel.comments.stars\"\n                                    }\n                                }\n                            }\n                        }\n                    }\n                }\n            }\n        }\n    },\n    \"sort\": [\n        {\n            \"_score\": {\n                \"order\": \"desc\"\n            }\n        },\n        {\n            \"hotel.name.keyword\": {\n                \"order\": \"desc\"\n            }\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9201/hotels_advanced/_search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9201",
+					"path": [
+						"hotels_advanced",
+						"_search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Geo aggregation",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"size\": 0,\n  \"aggregations\": {\n    \"large-grid\": {\n      \"geohash_grid\": {\n        \"field\": \"hotel.location\",\n        \"precision\": 3\n      }\n    }\n  }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9201/hotels_advanced/_search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9201",
+					"path": [
+						"hotels_advanced",
+						"_search"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
