@@ -87,3 +87,7 @@ Predicate restrictions = cb.conjunction();
                 return cb.and(queryParams.apllySearchConditions(root, cb, restrictions));
             }
         };
+
+
+#show bind values:
+`logger.level.org.hibernate.type.descriptor.sql=trace`
