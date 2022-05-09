@@ -91,3 +91,37 @@ Predicate restrictions = cb.conjunction();
 
 #show bind values:
 `logger.level.org.hibernate.type.descriptor.sql=trace`
+    
+```
+    @Repository
+public interface PeopleRepository extends JpaRepository<People, Long> {
+
+    @Query(value = "SELECT p.name AS name, COUNT(dp.people_id) AS count " +
+        "FROM people p INNER JOIN dream_people dp " +
+        "ON p.id = dp.people_id " +
+        "WHERE p.user_id = :userId " +
+        "GROUP BY dp.people_id " +
+        "ORDER BY p.name", nativeQuery = true)
+    List<PeopleDTO> findByPeopleAndCountByUserId(@Param("userId") Long userId);
+
+    @Query(value = "SELECT p.name AS name, COUNT(dp.people_id) AS count " +
+        "FROM people p INNER JOIN dream_people dp " +
+        "ON p.id = dp.people_id " +
+        "WHERE p.user_id = :userId " +
+        "GROUP BY dp.people_id " +
+        "ORDER BY p.name", nativeQuery = true)
+    Page<PeopleDTO> findByPeopleAndCountByUserId(@Param("userId") Long userId, Pageable pageable);
+
+}
+
+
+
+// Interface to which result is projected
+public interface PeopleDTO {
+
+    String getName();
+
+    Long getCount();
+
+}
+```
