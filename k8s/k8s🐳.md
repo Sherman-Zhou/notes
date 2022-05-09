@@ -1,106 +1,165 @@
+# CNCF
+
+Cloud Native Computering Foudation
+
+# Kuberneate
+
+Greek, Pilot of the ship
+
+# OCI standard
+
+## Docker(2013)
+
+## Containerd
+
+## runc
+
+## cri-o (podman)
+
+## lxc
+
+# repository
+
+1. https://quay.io/
+2. https://hub.docker.com
+
 # kubectl cmd
-  `kubectl [cmd] [type] [name] [flags]
+
+`kubectl [cmd] [type] [name] [flags]
 
 ## cluster-info
+
 ## config view
+
 ## describe
+
 `kubectl describe deploy worker
+
 ## explain
+
 ## get (-w: watch)
+
 ```
 #label
 kubectl get pods -l app=rng
 # selector
 kubectl get pods --selector app=rng
 ```
+
     - all
     - namespace
     - pods
     - nodes
     - servers
+
 ## run
+
     - restart
       - =OnFailure
       - =Never
-    
 
 ```
     # will create a spec in background
     kubectl run pingpone --image alpine ping 1.1.1.1
     kubectl run --restart=Never
-     
+
 ```
+
 ## logs
+
 ```
     # 3rd party: https://github.com/wercker/stern
     logs xxx --tail 500 --follow
     logs -l run=pingpong --tail 10 --follow
 ```
+
 ## scale
+
 ```
 kubectl scale deployment pingpone --replicas 3
 ```
+
 ## create
+
 ```
     kubectl create deployment httpenv --image=bretfisher/httpenv
 
-    
+
 ```
+
 ## apply
+
 imperative vs declarative
 
 ## delete
+
 `kubectl delete -f xxx.yml
 
-## expose:  service
-```
-    kubectl expose deployment httpenv --port 8888
-     kubectl expose deploy/webui --type=NodePort --port=80
+## expose: service
 
 ```
+     kubectl expose deployment httpenv --port 8888
+     kubectl expose deploy/webui --type=NodePort --port=80
+     curl http://$(minikube ip):32000
+
+
+```
+
 ## attach
+
 `kubectl attach --namespace=shpod -ti shpod`
 
 ## diff
+
 `kubectl diff -f just-a-pod.yaml`
 
 ## label
+
 ```
 kubectl label pods -l app=rng active=yes
 # remove label
 kubectl label pod -l app=rng,pod-template-hash active-
 ```
+
 ## edit daemonset
+
 `kubectl edit daemonset rng`
 
 ## roleout
-`kubectl rollout status deploy worker  `
+
+`kubectl rollout status deploy worker `
 `kubectl rollout undo deploy worker --to-revision=1`
-`kubectl rollout history` 
+`kubectl rollout history`
 
 ## patch
 
 ## set
+
 ```
     kubectl set image deploy worker worker=dockercoins/worker:v0.2
 ```
 
 ## check the user if can do
+
 `kubectl auth can-i create deployments --as linda --namespace secret`
 
-## dump yml 
+## dump yml
+
     ```
         kubectl get deploy/rng -o yaml >rng.yml
         kubectl create deployment web --image nginx -o yaml --dry-run=client
         kubectl apply -f web.yaml --server-dry-run --validate=false -o yaml
     ```
+
 ## taint node key=value
 
-# k8s 
+# k8s
+
 ## Node types
+
     1. master: all through api server
-        - api server: accept request, save in etcdS         
-        - controller managment: get request from api server, create obj in etcd        
+        - api server: accept request, save in etcdS
+        - controller managment: get request from api server, create obj in etcd
         - scheduler: decide where to create pod
         - etcd: database
     2. worker
@@ -108,6 +167,7 @@ kubectl label pod -l app=rng,pod-template-hash active-
        - proxy
 
 ## core objects
+
 - pod
 - upgrade
 - replication
@@ -117,137 +177,152 @@ kubectl label pod -l app=rng,pod-template-hash active-
 - pvc
 
 ## Resource Type
- `kubectl api-resources`
-### Service 
-   Service Discovery,   Load Balance...
 
-  - service
-    - ClusterIP: default, only access in cluster
-    - NodePort: high port range
-    - LoadBalancer
-    - ExternalName
-    ```
-        kubectl expose deployment httpenv --port 8888
-        kubectl create service externalname k8s --external-name kubernetes.io
+`kubectl api-resources`
 
-    ```
-  - Ingresses
+### Service
 
-  headless service: ClusterIP = None
-    
+Service Discovery, Load Balance...
+
+- service
+
+  - ClusterIP: default, only access in cluster
+  - NodePort: high port range
+  - LoadBalancer
+  - ExternalName
+
+  ```
+      kubectl expose deployment httpenv --port 8888
+      kubectl create service externalname k8s --external-name kubernetes.io
+
+  ```
+
+- Ingresses
+
+headless service: ClusterIP = None
+
 ### StatefulSet
-  port domain name:
-    name.servericeName.namespace.svc.cluster.local
 
-### DaemonSet: run on every node 
+port domain name:
+name.servericeName.namespace.svc.cluster.local
+
+### DaemonSet: run on every node
+
     - kube-proxy
     - CNI plugin
     - monitoring agents
 
 ## Job, CronJob
 
-
 ### pods
-  1. imagePullPolicy
 
-    - Always
-    - IfNotPresent
-    - Never
+1. imagePullPolicy
 
-  2. Resources
-    cpu= value/1000
-    - requests
-      ```
-        memory: "64Mi"
-        cpu: "250m"
-      ```
-    - limits
-      ```
-        memory: "128Mi"
-        cpu: "500m"
-      ```
-  3. restartPolicy
+   - Always
+   - IfNotPresent
+   - Never
 
-    - Always
-    - OnFailure
-    - Never
+2. Resources
+   cpu= value/1000
+
+   - requests
+     ```
+       memory: "64Mi"
+       cpu: "250m"
+     ```
+   - limits
+     ```
+       memory: "128Mi"
+       cpu: "500m"
+     ```
+
+3. restartPolicy
+
+   - Always
+   - OnFailure
+   - Never
 
 4. healthchecks
-  - probe type
-    1. liveness
-        will be killed if dead
-        ```
-        containers:
-        - name: ...
-          image: ...
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 30
-            periodSeconds: 5
-        
-        ontainers:
-        - name: redis
-          image: custom-redis-image
-          livenessProbe:
-            exec:
-              command:
-              - /tini
-              - -s
-              - --
-              - redis-cli
-              - ping
-            initialDelaySeconds: 30
-            periodSeconds: 5
 
-        ```
-    2. readiness
-        if the container to ready to serve traffic
-    3. startup
+- probe type
 
+  1. liveness
+     will be killed if dead
 
-  -  probe type
-    1. httpGet
-    2. tcpSocket
-    3. exec: tini
+     ```
+     containers:
+     - name: ...
+       image: ...
+       livenessProbe:
+         httpGet:
+           path: /
+           port: 80
+         initialDelaySeconds: 30
+         periodSeconds: 5
 
-### scheduler 
- - nodeSelector
- - affinity --> nodeAffinity(亲和性)
-   - 硬亲和性
-   `requiredDuringSchedulingIngoredDuringExecution`
-   - 软亲和性
+     ontainers:
+     - name: redis
+       image: custom-redis-image
+       livenessProbe:
+         exec:
+           command:
+           - /tini
+           - -s
+           - --
+           - redis-cli
+           - ping
+         initialDelaySeconds: 30
+         periodSeconds: 5
+
+     ```
+
+  2. readiness
+     if the container to ready to serve traffic
+  3. startup
+
+- probe type
+
+  1. httpGet
+  2. tcpSocket
+  3. exec: tini
+
+### scheduler
+
+- nodeSelector
+- affinity --> nodeAffinity(亲和性)
+  - 硬亲和性
+    `requiredDuringSchedulingIngoredDuringExecution`
+  - 软亲和性
     `preferredDuringSchedulingIngoredDuringExecution`
- - Node Taint (污点、污点容忍) - node property
- ` kubectl taint node env=NoSchedule`
-  - value
-    1. NoSchedule
-    2. PreferNoSchedule
-    3. NoExecute
+- Node Taint (污点、污点容忍) - node property
+  ` kubectl taint node env=NoSchedule`
+- value
 
-  - 场景
-   1. 专有节点
-   2. 特定硬件节点
-   3. 基于Taint驱逐
+  1. NoSchedule
+  2. PreferNoSchedule
+  3. NoExecute
 
-  
+- 场景
 
+1.  专有节点
+2.  特定硬件节点
+3.  基于 Taint 驱逐
 
 ### Controller
- mngt and run pods
- controller -> selector (label) -> pods
 
- 1. deployment
-  create deployment via cmd or
+mngt and run pods
+controller -> selector (label) -> pods
+
+1.  deployment
+    create deployment via cmd or
     `kubectl create deployment name --image=nginx`
-  change deployment image:
-      `kubectl set image deployment name nginx=nginx:1.1.5`
-
+    change deployment image:
+    `kubectl set image deployment name nginx=nginx:1.1.5`
 
 ### events
 
 ### ConfigMap
+
 ```
     kubectl create configmap my-app-config --from-file=app.config
     kubectl create cm my-app-config --from-env-file=app.conf
@@ -273,19 +348,35 @@ spec:
 ```
 
 ### secrets
+
 ```
-apiVersion: v1 
-kind: Secret 
-metadata: 
-  name: mysecret 
-  type: Opaque 
-  data: 
-     password: MWYyZDFlMmU2N2Rm 
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecret
+  type: Opaque
+  data:
+     password: MWYyZDFlMmU2N2Rm
      username: YWRtaW4=
 
 ```
 
+### autoscale
+
+```
+ kubectl autoscale deployment xxx --cpu-percent=50 --min=1 --max=10
+
+//horizontalpodautoscalers
+ kubectl get hpa
+
+ //minikube neeed to enable addons metrices-server
+minikube addons list
+kubectl addons enable metrics-server
+
+```
+
 # k8s yml
+
 ```
     apiVersion:  # find with "kubectl api-versions"
     kind:        # find with "kubectl api-resources"
@@ -295,15 +386,22 @@ metadata:
     kubectl explain <kind> --recursive
 ```
 
-
-
 ## Ingress Controller
-  1. Ingress Controller Pods
-  2. Ingress Resource 
-  3. Service for app
-### nginx, 
-### traefix
 
+1. Ingress Controller Pods
+2. Ingress Resource
+3. Service for app
+
+### nginx
+
+```
+kubectl create ingress nginxsvc-ingress  --class=nginx --rule="/=nginxsvc:80" --rule="/hello=newdep:8080"
+
+kubectl port-forward --namespace=ingress-nginx service/ingress-nginx-controller 8080:80
+
+```
+
+### traefix
 
 ## RBAC
 
@@ -341,8 +439,15 @@ metadata:
 ```
 
 ## others:
+
 ``
 
 registry.aliyuncs.com/google_containers/
 
-``               
+``
+
+minikube start \
+ --image-mirror-country=cn \
+ --registry-mirror=https://xxx.mirror.aliyuncs.com \
+ --image-repository=registry.cn-hangzhou.aliyuncs.com/google_containers \
+ --iso-url=https://kubernetes.oss-cn-hangzhou.aliyuncs.com/minikube/iso/minikube-v1.9.0.iso
